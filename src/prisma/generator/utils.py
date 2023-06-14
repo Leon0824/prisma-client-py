@@ -83,9 +83,7 @@ def remove_suffix(path: Union[str, Path], suf: str) -> str:
     if isinstance(path, Path):
         path = str(path)
 
-    if suf and path.endswith(suf):
-        return path[: -len(suf)]
-    return path
+    return path[: -len(suf)] if suf and path.endswith(suf) else path
 
 
 def copy_tree(src: Path, dst: Path) -> None:

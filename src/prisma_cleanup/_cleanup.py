@@ -14,11 +14,7 @@ class SourceLoader(Protocol):
 
 
 def main(*args: str) -> None:
-    if args:
-        pkg_name = args[0]
-    else:
-        pkg_name = 'prisma'
-
+    pkg_name = args[0] if args else 'prisma'
     cleanup(pkg_name=pkg_name)
 
 

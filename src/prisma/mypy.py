@@ -99,14 +99,14 @@ class PrismaPlugin(Plugin):
     def get_method_hook(
         self, fullname: str
     ) -> Optional[Callable[[MethodContext], Type]]:
-        match = CLIENT_ACTION_CHILD.match(fullname)
-        if not match:
+        if match := CLIENT_ACTION_CHILD.match(fullname):
+            return (
+                self.handle_action_invocation
+                if match.group('name') in ACTIONS
+                else None
+            )
+        else:
             return None
-
-        if match.group('name') in ACTIONS:
-            return self.handle_action_invocation
-
-        return None
 
     def handle_action_invocation(self, ctx: MethodContext) -> Type:
         # TODO: if an error occurs, log it so that we don't cause mypy to
@@ -164,11 +164,7 @@ class PrismaPlugin(Plugin):
             if self.config.warn_parsing_errors:
                 # TODO: add more details
                 # e.g. "include" to "find_unique" of "UserActions"
-                if isinstance(exc, UnparsedExpression):
-                    err_ctx = exc.context
-                else:
-                    err_ctx = include_expr
-
+                err_ctx = exc.context if isinstance(exc, UnparsedExpression) else include_expr
                 error_unable_to_parse(
                     ctx.api,
                     err_ctx,
@@ -259,12 +255,14 @@ class PrismaPlugin(Plugin):
                 if arg_name == name:
                     return ctx.args[i][j]
 
-        # positional arguments
-        for i, arg_name in enumerate(ctx.callee_arg_names):
-            if arg_name == name and ctx.args[i]:
-                return ctx.args[i][0]
-
-        return None
+        return next(
+            (
+                ctx.args[i][0]
+                for i, arg_name in enumerate(ctx.callee_arg_names)
+                if arg_name == name and ctx.args[i]
+            ),
+            None,
+        )
 
     def is_optional_type(self, typ: Type) -> bool:
         return isinstance(typ, UnionType) and self.is_optional_union_type(typ)
@@ -275,7 +273,7 @@ class PrismaPlugin(Plugin):
     # TODO: why is fullname Any?
 
     def is_coroutine_type(self, typ: Instance) -> bool:
-        return bool(typ.type.fullname == 'typing.Coroutine')
+        return typ.type.fullname == 'typing.Coroutine'
 
     def is_list_type(self, typ: Type) -> bool:
         return (
@@ -287,7 +285,7 @@ class PrismaPlugin(Plugin):
         # so we cannot check that, just checking if the expression
         # inherits from a class that ends with dict is good enough
         # for our use case
-        return bool(expr.fullname == 'builtins.dict') or bool(
+        return expr.fullname == 'builtins.dict' or bool(
             isinstance(expr.node, TypeInfo)
             and expr.node.bases
             and expr.node.bases[0].type.fullname.lower().endswith('dict')

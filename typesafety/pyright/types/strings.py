@@ -105,13 +105,7 @@ async def filtering(client: Prisma) -> None:
             },
         },
     )
-    await client.types.find_first(
-        where={  # E: Argument of type "dict[str, dict[str, list[Unknown]]]" cannot be assigned to parameter "where" of type "TypesWhereInput | None" in function "find_first"
-            'string': {
-                'gt': list(),
-            },
-        },
-    )
+    await client.types.find_first(where={'string': {'gt': []}})
     await client.types.find_first(
         where={  # E: Argument of type "dict[str, dict[str, Prisma]]" cannot be assigned to parameter "where" of type "TypesWhereInput | None" in function "find_first"
             'string': {

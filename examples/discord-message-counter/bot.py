@@ -7,12 +7,7 @@ from prisma import Prisma
 
 # commands.Bot is only a Generic Type while type checking
 # thats why we have to do this little dance around it
-if TYPE_CHECKING:
-    BotBase = commands.Bot['Context']
-else:
-    BotBase = commands.Bot
-
-
+BotBase = commands.Bot['Context'] if TYPE_CHECKING else commands.Bot
 class Context(commands.Context):
     bot: 'Bot'
 

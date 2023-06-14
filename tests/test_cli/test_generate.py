@@ -101,7 +101,7 @@ def test_prisma_error_non_zero_exit_code(
     testdir: Testdir, runner: Runner
 ) -> None:
     """Exits non-zero when the prisma process exits non-zero"""
-    path = testdir.make_schema(schema=testdir.default_schema + 'foo')
+    path = testdir.make_schema(schema=f'{testdir.default_schema}foo')
     result = runner.invoke(['py', 'generate', f'--schema={path}'])
     assert result.exit_code != 0
     assert 'Error code: P1012' in result.output

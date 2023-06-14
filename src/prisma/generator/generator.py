@@ -189,12 +189,14 @@ class GenericGenerator(ABC, Generic[BaseModelT]):
         if not isinstance(cls, InheritsGeneric):
             raise RuntimeError('Could not resolve generic type arguments.')
 
-        typ: Optional[Any] = None
-        for base in cls.__orig_bases__:
-            if base.__origin__ == GenericGenerator:
-                typ = base
-                break
-
+        typ: Optional[Any] = next(
+            (
+                base
+                for base in cls.__orig_bases__
+                if base.__origin__ == GenericGenerator
+            ),
+            None,
+        )
         if typ is None:  # pragma: no cover
             raise RuntimeError(
                 'Could not find the GenericGenerator type;\n'

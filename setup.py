@@ -16,13 +16,13 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 version = ''
 with open('src/prisma/__init__.py', encoding='utf-8') as f:
-    match = re.search(
+    if match := re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
-    )
-    if not match:
-        raise RuntimeError('version is not set')
+    ):
+        version = match[1]
 
-    version = match.group(1)
+    else:
+        raise RuntimeError('version is not set')
 
 if not version:
     raise RuntimeError('version is not set')

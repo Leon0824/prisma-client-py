@@ -64,11 +64,7 @@ def pytest_ignore_collect(
         # not an integration test
         return None
 
-    if len(path.parts) <= 3:
-        # integration root dir, leave handling to pytest
-        return None
-
-    return path.parts[-1] != 'test.sh'
+    return None if len(path.parts) <= 3 else path.parts[-1] != 'test.sh'
 
 
 def pytest_collect_file(

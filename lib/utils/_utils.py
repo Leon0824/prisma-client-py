@@ -24,6 +24,4 @@ def maybe_decode(data: str | bytes) -> str:
     - Given a `bytes` object, return it decoded using utf8.
     - Given a `str` object, return it as is.
     """
-    if isinstance(data, bytes):
-        return data.decode('utf8')
-    return data
+    return data.decode('utf8') if isinstance(data, bytes) else data

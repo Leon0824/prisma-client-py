@@ -220,7 +220,7 @@ async def test_copy() -> None:
         },
     )
     client2 = client1._copy()
-    assert not client2.is_connected() is None
+    assert client2.is_connected() is not None
     assert client2._log_queries is True
     assert client2._datasource == {'url': 'file:foo.db'}
     assert client2._connect_timeout == 15

@@ -5,4 +5,4 @@ def quote(string: str) -> str:
 
     This does not do any form of escaping, the input is expected to not contain any single quotes.
     """
-    return "'" + string + "'"
+    return f"'{string}'"

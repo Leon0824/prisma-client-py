@@ -54,8 +54,7 @@ def create_shortened():
 
 @app.route('/<id>')
 def url_redirect(id: str):
-    decoded = hashids.decode(id)
-    if decoded:
+    if decoded := hashids.decode(id):
         original_id = decoded[0]
         url = Url.prisma().update(
             where={
