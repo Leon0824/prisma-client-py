@@ -32,7 +32,4 @@ def start_database(
 
 
 def _format_version(version: str | None) -> str:
-    if version is None:
-        return ''
-
-    return '-' + version.replace('.', '-')
+    return '' if version is None else '-' + version.replace('.', '-')

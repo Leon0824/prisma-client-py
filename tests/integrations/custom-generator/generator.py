@@ -22,9 +22,7 @@ class MyGenerator(GenericGenerator[Data]):
             data.generator.config.header,
             '',
         ]
-        for model in data.dmmf.datamodel.models:
-            lines.append(f'- {model.name}')
-
+        lines.extend(f'- {model.name}' for model in data.dmmf.datamodel.models)
         output = Path(data.generator.output.value)
         output.write_text('\n'.join(lines))
 

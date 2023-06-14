@@ -74,7 +74,7 @@ def temp_env_update(env: Dict[str, str]) -> Iterator[None]:
         for key in env:
             os.environ.pop(key, None)
 
-        os.environ.update(old)
+        os.environ |= old
 
 
 @contextlib.contextmanager
@@ -123,9 +123,7 @@ def assert_never(value: NoReturn) -> NoReturn:
 
     https://github.com/microsoft/pyright/issues/767
     """
-    assert False, 'Unhandled type: {}'.format(
-        type(value).__name__
-    )  # pragma: no cover
+    assert False, f'Unhandled type: {type(value).__name__}'
 
 
 def make_optional(value: _T) -> _T | None:

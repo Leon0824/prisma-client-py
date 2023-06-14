@@ -52,15 +52,14 @@ def _resolve_from_binary_paths(binary_paths: dict[str, str]) -> Path | None:
     if len(paths) == 1:
         return paths[0]
 
-    for path in paths:
-        # we only want to resolve to binary's that we can run on the current machine.
-        # because of the `binaryTargets` option some of the binaries we are given may
-        # not be targeting the same architecture as the current machine
-        if path.exists() and _can_execute_binary(path):
-            return path
-
-    # none of the given paths existed or they target a different architecture
-    return None
+    return next(
+        (
+            path
+            for path in paths
+            if path.exists() and _can_execute_binary(path)
+        ),
+        None,
+    )
 
 
 def _can_execute_binary(path: Path) -> bool:
@@ -83,8 +82,7 @@ def ensure(binary_paths: dict[str, str]) -> Path:
     log.debug('Expecting local query engine %s', local_path)
     log.debug('Expecting global query engine %s', global_path)
 
-    binary = os.environ.get('PRISMA_QUERY_ENGINE_BINARY')
-    if binary:
+    if binary := os.environ.get('PRISMA_QUERY_ENGINE_BINARY'):
         log.debug('PRISMA_QUERY_ENGINE_BINARY is defined, using %s', binary)
 
         if not Path(binary).exists():
@@ -100,10 +98,7 @@ def ensure(binary_paths: dict[str, str]) -> Path:
         log.debug('Query engine found in the working directory')
     elif file_from_paths is not None and file_from_paths.exists():
         file = file_from_paths
-        log.debug(
-            'Query engine found from the Prisma CLI generated path: %s',
-            file_from_paths,
-        )
+        log.debug('Query engine found from the Prisma CLI generated path: %s', file)
     elif global_path.exists():
         file = global_path
         log.debug('Query engine found in the global path')
@@ -115,8 +110,7 @@ def ensure(binary_paths: dict[str, str]) -> Path:
             expected = f'{local_path} or {global_path} to exist but neither'
 
         raise errors.BinaryNotFoundError(
-            f'Expected {expected} were found or could not be executed.\n'
-            + 'Try running prisma py fetch'
+            f'Expected {expected} were found or could not be executed.\nTry running prisma py fetch'
         )
 
     log.debug('Using Query Engine binary at %s', file)

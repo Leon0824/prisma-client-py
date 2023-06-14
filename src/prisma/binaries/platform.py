@@ -12,9 +12,7 @@ def name() -> str:
 
 def check_for_extension(file: str) -> str:
     if name() == 'windows' and '.exe' not in file:
-        if '.gz' in file:
-            return file.replace('.gz', '.exe.gz')
-        return file + '.exe'
+        return file.replace('.gz', '.exe.gz') if '.gz' in file else f'{file}.exe'
     return file
 
 
@@ -40,10 +38,10 @@ def _get_linux_distro_details() -> Tuple[str, str]:
     output = str(process.stdout, sys.getdefaultencoding())
 
     match = re.search(r'ID="?([^"\n]*)"?', output)
-    distro_id = match.group(1) if match else ''
+    distro_id = match[1] if match else ''
 
     match = re.search(r'ID_LIKE="?([^"\n]*)"?', output)
-    distro_id_like = match.group(1) if match else ''
+    distro_id_like = match[1] if match else ''
     return distro_id, distro_id_like
 
 
@@ -70,8 +68,4 @@ def get_openssl() -> str:
 
 def parse_openssl_version(string: str) -> str:
     match = re.match(r'^OpenSSL\s(\d+\.\d+)\.\d+', string)
-    if match is None:
-        # default
-        return '1.1.x'
-
-    return match.group(1) + '.x'
+    return '1.1.x' if match is None else f'{match[1]}.x'

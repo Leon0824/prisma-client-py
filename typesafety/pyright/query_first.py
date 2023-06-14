@@ -17,7 +17,7 @@ async def main(client: Prisma) -> None:
     query = 'safe StringLiteral query'
     await client.query_first(query, model=User)
 
-    query = str('unsafe str query')
+    query = 'unsafe str query'
     await client.query_first(
         query,  # E: Argument of type "str" cannot be assigned to parameter "query" of type "LiteralString" in function "query_first"
         model=User,

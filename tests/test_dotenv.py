@@ -49,7 +49,7 @@ def test_client_loads_dotenv(testdir: Testdir, name: str) -> None:
 
 def test_load_env_no_files(testdir: Testdir) -> None:
     """Loading dotenv files without any files present does not error"""
-    assert len(list(testdir.path.iterdir())) == 0
+    assert not list(testdir.path.iterdir())
     load_env()
     assert ENV_KEY not in os.environ
 

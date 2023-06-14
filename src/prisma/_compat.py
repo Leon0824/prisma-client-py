@@ -62,6 +62,4 @@ else:
 
 
 def removeprefix(string: str, prefix: str) -> str:
-    if string.startswith(prefix):
-        return string[len(prefix) :]
-    return string
+    return string[len(prefix) :] if string.startswith(prefix) else string

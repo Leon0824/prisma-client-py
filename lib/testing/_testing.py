@@ -59,11 +59,7 @@ def assert_similar_time(
 
     This issue does not appear to be solvable by us, please create an issue if you know of a solution.
     """
-    if dt1 > dt2:
-        delta = dt1 - dt2
-    else:
-        delta = dt2 - dt1
-
+    delta = dt1 - dt2 if dt1 > dt2 else dt2 - dt1
     assert delta.days == 0
     assert delta.total_seconds() < threshold
 

@@ -37,11 +37,7 @@ def test_completeness(method: Any) -> None:
         if name == 'self':
             continue
 
-        if param.kind == param.VAR_POSITIONAL:
-            qualified = f'\\*{name}'
-        else:
-            qualified = name
-
+        qualified = f'\\*{name}' if param.kind == param.VAR_POSITIONAL else name
         match = re.search(
             r'Parameters\n----------((.|\n)*)^{0}$((.|\n)*)Returns'.format(
                 qualified

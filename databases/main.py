@@ -272,11 +272,10 @@ class Runner:
 
     def setup(self) -> None:
         # TODO: split up more
-        print('database config: ' + self.config.json(indent=2))
+        print(f'database config: {self.config.json(indent=2)}')
         print('for async: ', self.for_async)
 
-        exclude_files = self.exclude_files
-        if exclude_files:
+        if exclude_files := self.exclude_files:
             print(f'excluding files:\n{yaml.dump(list(exclude_files))}')
         else:
             print('excluding files: []')
@@ -330,10 +329,7 @@ class Runner:
             f'--schema={self.schema}',
         )
 
-        args = []
-        if pytest_args is not None:  # pragma: no cover
-            args = shlex.split(pytest_args)
-
+        args = shlex.split(pytest_args) if pytest_args is not None else []
         # TODO: use PYTEST_ADDOPTS instead
         self.session.run(
             *self.python_args,
@@ -450,7 +446,7 @@ def tests_relpath(path: str, *, for_async: bool) -> str:
 def title(text: str) -> str:
     # TODO: improve formatting
     dashes = '-' * 30
-    return dashes + ' ' + click.style(text, bold=True) + ' ' + dashes
+    return f'{dashes} {click.style(text, bold=True)} {dashes}'
 
 
 def entrypoint(session: nox.Session) -> None:

@@ -159,9 +159,7 @@ def type_as_string(typ: str) -> str:
     enums.Role -> 'enums.Role'
     """
     # TODO: use this function internally in this module
-    if not typ.startswith("'") and not typ.startswith('"'):
-        return f"'{typ}'"
-    return typ
+    return typ if typ.startswith("'") or typ.startswith('"') else f"'{typ}'"
 
 
 def format_documentation(doc: str, indent: int = 4) -> str:
@@ -675,10 +673,14 @@ class Model(BaseModel):
     @cached_property
     def id_field(self) -> Optional['Field']:
         """Find a field that can be passed to the model's `WhereUnique` filter"""
-        for field in self.scalar_fields:  # pragma: no branch
-            if field.is_id or field.is_unique:
-                return field
-        return None
+        return next(
+            (
+                field
+                for field in self.scalar_fields
+                if field.is_id or field.is_unique
+            ),
+            None,
+        )
 
     @property
     def has_relational_fields(self) -> bool:
@@ -692,9 +694,7 @@ class Model(BaseModel):
     @property
     def plural_name(self) -> str:
         name = self.name
-        if name.endswith('s'):
-            return name
-        return f'{name}s'
+        return name if name.endswith('s') else f'{name}s'
 
     def resolve_field(self, name: str) -> 'Field':
         for field in self.all_fields:
@@ -825,9 +825,7 @@ class Field(BaseModel):
     @property
     def python_type(self) -> str:
         type_ = self._actual_python_type
-        if self.is_list:
-            return f'List[{type_}]'
-        return type_
+        return f'List[{type_}]' if self.is_list else type_
 
     @property
     def python_type_as_string(self) -> str:
@@ -898,9 +896,7 @@ class Field(BaseModel):
 
     @property
     def relational_args_type(self) -> str:
-        if self.is_list:
-            return f'FindMany{self.type}Args'
-        return f'{self.type}Args'
+        return f'FindMany{self.type}Args' if self.is_list else f'{self.type}Args'
 
     @property
     def required_on_create(self) -> bool:
@@ -930,9 +926,7 @@ class Field(BaseModel):
 
     def maybe_optional(self, typ: str) -> str:
         """Wrap the given type string within `Optional` if applicable"""
-        if self.is_required or self.is_relational:
-            return typ
-        return f'Optional[{typ}]'
+        return typ if self.is_required or self.is_relational else f'Optional[{typ}]'
 
     def get_update_input_type(self) -> str:
         if self.kind == 'object':
@@ -960,17 +954,13 @@ class Field(BaseModel):
             return None
 
         name = self.type
-        for model in get_datamodel().models:
-            if model.name == name:
-                return model
-        return None
+        return next(
+            (model for model in get_datamodel().models if model.name == name), None
+        )
 
     def get_corresponding_enum(self) -> Optional['Enum']:
         typ = self.type
-        for enum in get_datamodel().enums:
-            if enum.name == typ:
-                return enum
-        return None  # pragma: no cover
+        return next((enum for enum in get_datamodel().enums if enum.name == typ), None)
 
     def get_sample_data(self, *, increment: bool = True) -> str:
         # returning the same data that was last sampled is useful

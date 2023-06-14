@@ -28,7 +28,7 @@ def test_repeated_rstrip_bug(tmp_path: Path) -> None:
 
     template = 'schema.prisma.jinja'
     tmp_path.joinpath(template).write_text('foo')
-    render_template(tmp_path, template, dict(), env=env)
+    render_template(tmp_path, template, {}, env=env)
 
     assert tmp_path.joinpath('schema.prisma').read_text() == 'foo'
 

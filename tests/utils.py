@@ -168,10 +168,7 @@ class Testdir:
         if not isinstance(path, Path):
             path = Path(path)
 
-        if not path.is_absolute():
-            return str(path)
-
-        return str(path.relative_to(self.path))
+        return str(path.relative_to(self.path)) if path.is_absolute() else str(path)
 
     def make_from_function(
         self,
@@ -276,13 +273,14 @@ def get_source_from_function(function: FuncType, **env: Any) -> str:
     lines = inspect.getsource(function).splitlines()[1:]
 
     # setup env after imports
-    for index, line in enumerate(lines):
-        if not line.lstrip(' ').startswith(('import', 'from')):
-            start = index
-            break
-    else:
-        start = 0
-
+    start = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if not line.lstrip(' ').startswith(('import', 'from'))
+        ),
+        0,
+    )
     lines = textwrap.dedent('\n'.join(lines)).splitlines()
     for name, value in env.items():
         if isinstance(value, str):  # pragma: no branch

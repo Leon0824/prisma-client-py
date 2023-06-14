@@ -61,9 +61,7 @@ def cli(
         args.append('--watch')
 
     if generator:
-        for name in generator:
-            args.append(f'--generator={name}')
-
+        args.extend(f'--generator={name}' for name in generator)
     env: Dict[str, str] = {}
     prefix = 'PRISMA_PY_CONFIG_'
     for key, value in kwargs.items():
@@ -79,7 +77,4 @@ def cli(
 
 
 def serialize(key: str, obj: Any) -> str:
-    if key == 'partials':
-        # partials has to be JSON serializable
-        return f'"{obj}"'
-    return str(obj)
+    return f'"{obj}"' if key == 'partials' else str(obj)

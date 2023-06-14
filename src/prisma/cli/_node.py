@@ -149,10 +149,7 @@ class NodeBinaryStrategy(Strategy):
 
     @classmethod
     def resolve(cls, target: Target) -> NodeBinaryStrategy:
-        path = None
-        if config.use_global_node:
-            path = _get_global_binary(target)
-
+        path = _get_global_binary(target) if config.use_global_node else None
         if path is not None:
             return NodeBinaryStrategy(
                 path=path,
@@ -193,16 +190,11 @@ class NodeBinaryStrategy(Strategy):
         # TODO: what hapens on cygwin?
         if platform.name() == 'windows':
             bin_dir = cache_dir / 'Scripts'
-            if target == 'node':
-                path = bin_dir / 'node.exe'
-            else:
-                path = bin_dir / f'{target}.cmd'
+            path = bin_dir / 'node.exe' if target == 'node' else bin_dir / f'{target}.cmd'
         else:
             path = cache_dir / 'bin' / target
 
-        if target == 'npm':
-            return cls(path=path, resolver='nodeenv', target=target)
-        elif target == 'node':
+        if target in ['npm', 'node']:
             return cls(path=path, resolver='nodeenv', target=target)
         else:
             raise UnknownTargetError(target=target)
